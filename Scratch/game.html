@@ -1,0 +1,417 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class SugarRushGame extends JFrame {
+
+    private GamePanel gamePanel;
+
+    public SugarRushGame() {
+        setTitle("Sugar Rush Racer - Java Edition");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+
+        gamePanel = new GamePanel();
+        add(gamePanel);
+
+        pack(); // Sizes the window to fit the preferred size of GamePanel
+        setLocationRelativeTo(null); // Center the window
+        setVisible(true);
+
+        // Start the game after the frame is visible and set up
+        gamePanel.startGame();
+    }
+
+    // Inner class for the main game logic and drawing area
+    class GamePanel extends JPanel implements ActionListener, KeyListener {
+
+        // --- Game Configuration ---
+        private final int PANEL_WIDTH = 400;
+        private final int PANEL_HEIGHT = 600;
+        private final int LANE_WIDTH = PANEL_WIDTH / 3;
+        private final int PLAYER_WIDTH = 40;
+        private final int PLAYER_HEIGHT = 60;
+        private final int MAX_LIVES = 5;
+        private final int INVINCIBILITY_FRAMES = 90; // Frames invincible after hit (~1.5 sec)
+
+        // --- Game State ---
+        private Timer gameTimer;
+        private boolean running = false;
+        private boolean gameOver = false;
+        private int playerLane = 1; // 0, 1, 2
+        private int playerX;
+        private final int playerY = PANEL_HEIGHT - PLAYER_HEIGHT - 30; // Position near bottom
+        private int currentLives;
+        private List<Obstacle> obstacles;
+        private Random random;
+        private int gameSpeed = 4; // Pixels per timer tick
+        private int obstacleSpawnCounter = 0;
+        private int obstacleSpawnRate = 80; // Lower = more frequent (ticks)
+        private boolean moveLeftIntent = false;
+        private boolean moveRightIntent = false;
+        private boolean isInvincible = false;
+        private int invincibilityCounter = 0;
+        // private int score = 0; // Optional score
+
+
+        public GamePanel() {
+            setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
+            setBackground(new Color(255, 250, 250)); // Marshmallow white
+            setFocusable(true); // Important to receive key events
+            addKeyListener(this);
+            random = new Random();
+            obstacles = new ArrayList<>();
+        }
+
+        public void startGame() {
+            // Initialize/Reset game state
+            playerLane = 1;
+            playerX = getLaneCenterX(playerLane) - PLAYER_WIDTH / 2;
+            currentLives = MAX_LIVES;
+            obstacles.clear();
+            gameSpeed = 4;
+            obstacleSpawnCounter = 0;
+            gameOver = false;
+            running = true;
+            isInvincible = false;
+            invincibilityCounter = 0;
+            // score = 0;
+
+            // Start the game loop timer (approx 60 FPS)
+            gameTimer = new Timer(16, this); // 16ms delay ~ 60 updates/sec
+            gameTimer.start();
+            requestFocusInWindow(); // Make sure panel has focus for keys
+        }
+
+        private void resetGame() {
+             startGame(); // Just call start game to re-initialize everything
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g); // Clears the panel
+
+            Graphics2D g2d = (Graphics2D) g;
+             // Enable anti-aliasing for smoother shapes (optional)
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+
+            // Draw Background elements (placeholder - use images later)
+            g2d.setColor(new Color(240, 224, 208)); // Graham cracker color
+            for (int i = 0; i < 3; i++) {
+                 g2d.fillRect(i * LANE_WIDTH, 0, LANE_WIDTH -1, PANEL_HEIGHT); // Draw lanes slightly separated
+            }
+
+
+            // Draw Obstacles
+            for (Obstacle obs : obstacles) {
+                obs.draw(g2d);
+            }
+
+            // Draw Player
+            // Flash player if invincible
+            if (isInvincible && (invincibilityCounter / 5) % 2 == 0) {
+                 // Draw nothing to make it flash (or draw grey)
+                 g2d.setColor(Color.LIGHT_GRAY);
+                 g2d.fillRect(playerX, playerY, PLAYER_WIDTH, PLAYER_HEIGHT);
+
+            } else {
+                 // Draw normal player (placeholder - use image later)
+                g2d.setColor(new Color(255, 69, 0)); // Orangey-red candy color
+                g2d.fillRect(playerX, playerY, PLAYER_WIDTH, PLAYER_HEIGHT);
+                g2d.setColor(Color.YELLOW); // Headlights
+                g2d.fillRect(playerX + 5, playerY + 5, 8, 10);
+                g2d.fillRect(playerX + PLAYER_WIDTH - 13, playerY + 5, 8, 10);
+            }
+
+
+            // Draw UI (Lives)
+            drawLives(g2d);
+            // drawScore(g2d); // Optional
+
+
+            // Draw Game Over message
+            if (gameOver) {
+                drawGameOver(g2d);
+            }
+
+            // Sync Toolkit - Ensures graphics are displayed smoothly on some systems
+            Toolkit.getDefaultToolkit().sync();
+        }
+
+         private void drawLives(Graphics2D g2d) {
+            g2d.setColor(Color.BLACK);
+            g2d.setFont(new Font("Arial", Font.BOLD, 16));
+            g2d.drawString("Lives: ", 10, 20);
+            int cakeX = 60;
+            int cakeY = 8;
+            int cakeSize = 15;
+            for (int i = 0; i < currentLives; i++) {
+                // Draw placeholder cakes (use images later)
+                g2d.setColor(new Color(255, 192, 203)); // Pink
+                g2d.fillRect(cakeX + i * (cakeSize + 5), cakeY, cakeSize, cakeSize);
+                g2d.setColor(new Color(255, 105, 180)); // Hot Pink outline
+                g2d.drawRect(cakeX + i * (cakeSize + 5), cakeY, cakeSize, cakeSize);
+            }
+        }
+
+        private void drawGameOver(Graphics2D g2d) {
+             String msg = "Game Over!";
+             String restartMsg = "Press Enter to Restart";
+             Font largeFont = new Font("Helvetica", Font.BOLD, 40);
+             Font smallFont = new Font("Helvetica", Font.PLAIN, 20);
+             FontMetrics fmLarge = getFontMetrics(largeFont);
+             FontMetrics fmSmall = getFontMetrics(smallFont);
+
+             g2d.setColor(Color.RED);
+             g2d.setFont(largeFont);
+             g2d.drawString(msg, (PANEL_WIDTH - fmLarge.stringWidth(msg)) / 2, PANEL_HEIGHT / 2 - 20);
+
+             g2d.setColor(Color.BLACK);
+             g2d.setFont(smallFont);
+             g2d.drawString(restartMsg, (PANEL_WIDTH - fmSmall.stringWidth(restartMsg)) / 2, PANEL_HEIGHT / 2 + 20);
+         }
+
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // This method is called by the Timer - it's our game loop!
+            if (running && !gameOver) {
+                updateGame();
+                repaint(); // Triggers paintComponent to redraw the screen
+            }
+        }
+
+        private void updateGame() {
+            movePlayer();
+            updateObstacles();
+            checkCollisions();
+            spawnObstacles();
+             updateInvincibility();
+            // updateScore(); // Optional
+        }
+
+        private void updateInvincibility() {
+            if (isInvincible) {
+                invincibilityCounter--;
+                if (invincibilityCounter <= 0) {
+                    isInvincible = false;
+                }
+            }
+        }
+
+
+        private void movePlayer() {
+            int targetLane = playerLane;
+            if (moveLeftIntent) {
+                targetLane = Math.max(0, playerLane - 1);
+            }
+            if (moveRightIntent) {
+                 targetLane = Math.min(2, playerLane + 1);
+            }
+
+            if(targetLane != playerLane) {
+                playerLane = targetLane;
+                 // Instantly move to the new lane's center
+                playerX = getLaneCenterX(playerLane) - PLAYER_WIDTH / 2;
+            }
+
+            // Reset intents so movement happens once per press signal
+             moveLeftIntent = false;
+             moveRightIntent = false;
+        }
+
+        private void spawnObstacles() {
+            obstacleSpawnCounter++;
+            if (obstacleSpawnCounter >= obstacleSpawnRate) {
+                obstacleSpawnCounter = 0;
+
+                int obsLane = random.nextInt(3); // Lane 0, 1, or 2
+                Obstacle.Type type = Obstacle.Type.values()[random.nextInt(Obstacle.Type.values().length)];
+                obstacles.add(new Obstacle(obsLane, type, PANEL_WIDTH, LANE_WIDTH));
+
+                // Optional: Gradually increase difficulty
+                // if (gameSpeed < 10) gameSpeed += 0.1;
+                 // if (obstacleSpawnRate > 30) obstacleSpawnRate--;
+            }
+        }
+
+        private void updateObstacles() {
+            // Use iterator to allow safe removal while iterating
+             for (int i = obstacles.size() - 1; i >= 0; i--) {
+                Obstacle obs = obstacles.get(i);
+                obs.move(gameSpeed);
+                if (obs.isOffScreen(PANEL_HEIGHT)) {
+                    obstacles.remove(i);
+                }
+            }
+        }
+
+
+         private void checkCollisions() {
+            if (isInvincible) {
+                return; // Skip collision checks while invincible
+            }
+
+            Rectangle playerBounds = new Rectangle(playerX, playerY, PLAYER_WIDTH, PLAYER_HEIGHT);
+
+            for (int i = obstacles.size() - 1; i >= 0; i--) {
+                Obstacle obs = obstacles.get(i);
+                if (obs.isHarmful()) {
+                     Rectangle obsBounds = obs.getBounds();
+                     if (playerBounds.intersects(obsBounds)) {
+                         // Collision!
+                         obstacles.remove(i); // Remove the obstacle
+                         currentLives--;
+                         isInvincible = true; // Grant invincibility
+                         invincibilityCounter = INVINCIBILITY_FRAMES;
+                         // System.out.println("Collision! Lives: " + currentLives); // Debug
+
+                         if (currentLives <= 0) {
+                             gameOver = true;
+                             running = false; // Stop game logic updates
+                             gameTimer.stop(); // Stop the timer
+                             // System.out.println("Game Over!"); // Debug
+                         }
+                         // Break after one collision per frame to avoid multiple hits
+                         break;
+                     }
+                }
+            }
+        }
+
+
+        private int getLaneCenterX(int laneIndex) {
+            return laneIndex * LANE_WIDTH + LANE_WIDTH / 2;
+        }
+
+
+        // --- KeyListener Methods ---
+        @Override
+        public void keyTyped(KeyEvent e) {
+            // Not used
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            int key = e.getKeyCode();
+
+             if (gameOver) {
+                 if (key == KeyEvent.VK_ENTER) {
+                     resetGame();
+                 }
+                 return; // Ignore game input if game is over
+             }
+
+            if (!running) return; // Ignore if not running
+
+            if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A) {
+                moveLeftIntent = true;
+                 moveRightIntent = false; // Prevent moving both ways at once
+            } else if (key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_D) {
+                moveRightIntent = true;
+                 moveLeftIntent = false; // Prevent moving both ways at once
+            }
+            // 'Up' key currently does nothing for player movement
+             // else if (key == KeyEvent.VK_UP || key == KeyEvent.VK_W) { }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+            // If you wanted movement to stop when key is released, handle here.
+            // For lane switching, we process on key press.
+        }
+    }
+
+    // --- Obstacle Class ---
+    static class Obstacle {
+        enum Type { LOLLIPOP, OREO, RAMP }
+
+        int x, y;
+        int width, height;
+        Type type;
+        boolean harmful;
+        Color color; // Placeholder for actual graphics
+
+        public Obstacle(int lane, Type type, int panelWidth, int laneWidth) {
+            this.type = type;
+            int laneCenterX = lane * laneWidth + laneWidth / 2;
+
+            switch (type) {
+                case LOLLIPOP:
+                    this.width = 30;
+                    this.height = 50;
+                    this.color = Color.MAGENTA;
+                    this.harmful = true;
+                    break;
+                case OREO:
+                    this.width = 45;
+                    this.height = 45;
+                    this.color = new Color(60, 40, 20); // Dark brown
+                    this.harmful = true;
+                    break;
+                case RAMP:
+                    this.width = laneWidth - 20; // Wider
+                    this.height = 30;
+                    this.color = Color.ORANGE; // Ramp color
+                    this.harmful = false; // Ramps are safe (no jump logic yet)
+                    break;
+                default: // Should not happen
+                     this.width = 30; this.height = 30; this.color = Color.GRAY; this.harmful = true;
+            }
+            this.x = laneCenterX - this.width / 2;
+            this.y = -this.height; // Start above screen
+        }
+
+        public void move(int speed) {
+            this.y += speed;
+        }
+
+        public void draw(Graphics2D g2d) {
+            g2d.setColor(this.color);
+             // Specific drawing for different types (placeholders)
+             if (type == Type.LOLLIPOP) {
+                 g2d.fillOval(x, y, width, width); // Round part
+                 g2d.fillRect(x + width / 2 - 3, y + width / 2, 6, height - width / 2); // Stick
+             } else if (type == Type.OREO) {
+                 g2d.fillRect(x, y, width, height); // Base rect
+                 g2d.setColor(Color.WHITE); // Cream
+                 g2d.fillRect(x, y + height / 3, width, height / 3);
+             } else if (type == Type.RAMP) {
+                 // Draw as a filled triangle (basic ramp shape)
+                Polygon rampShape = new Polygon();
+                rampShape.addPoint(x, y + height); // Bottom left
+                rampShape.addPoint(x + width / 2, y); // Top middle
+                rampShape.addPoint(x + width, y + height); // Bottom right
+                g2d.fillPolygon(rampShape);
+             } else {
+                 g2d.fillRect(x, y, width, height);
+             }
+        }
+
+        public Rectangle getBounds() {
+            return new Rectangle(x, y, width, height);
+        }
+
+        public boolean isOffScreen(int panelHeight) {
+            return this.y > panelHeight;
+        }
+
+         public boolean isHarmful() {
+             return harmful;
+         }
+    }
+
+
+    // --- Main Method ---
+    public static void main(String[] args) {
+        // Ensure GUI creation happens on the Event Dispatch Thread (EDT)
+        SwingUtilities.invokeLater(() -> new SugarRushGame());
+    }
+}

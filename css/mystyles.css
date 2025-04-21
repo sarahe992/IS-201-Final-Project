@@ -1,0 +1,64 @@
+body{
+    border: 100px solid white;
+    /* font-family: 'Times New Roman', Georgia, 'Times New Roman', Times, serif; */
+background-color: rgb(205, 212, 226);
+}
+.common-content :hover {
+    color: rgb(74, 48, 179)  ;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+  }
+  #about :hover  {
+    color: rgb(74, 48, 179)  ;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+  }
+.links :hover {
+    font-family: Arial, Helvetica, sans-serif;
+    color:black
+  }
+/* h1, h2, h3, .subheading{
+    font-family: 'Times New Roman', Georgia, 'Times New Roman', Times, serif !important;
+    color: blue;
+
+} */
+.title {
+    font-style: italic;
+    text-align: center;
+}
+
+ .ice-cream-rankings :hover{
+    font-style: italic;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color:beige
+}
+.toppings-rankings :hover{
+    font-style: italic;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color:beige
+}
+/* a: hover{
+    color: rgb(77, 121, 90) !important;
+    background-color: yellow
+
+} */
+
+img {
+    float: left;
+    margin-right: 100px;
+    width: 150px;
+  }
+
+  img:hover{
+    transform: scale(1.75);
+    transition: transform  0.3s ease
+  }
+
+  .anchor {
+    z-index: 1;
+    position: fixed;
+    bottom:0;
+    right: 0;
+    background-color: bisque;
+    font-size: xx-large;
+    font-family: 'Times New Roman', Times, serif;
+
+  }

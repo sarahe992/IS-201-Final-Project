@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word Guessing Game</title>
+  <a href="Index Ice Cream.html">Ice Cream Page</a>
+
+  <style>
+    
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: white;
+      color: navy;
+    }
+    #startBtn {
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: red;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    #phrase {
+      font-size: 32px;
+      margin: 30px 0;
+    }
+    .letter {
+      display: inline-block;
+      width: 30px;
+      border-bottom: 2px solid navy;
+      margin: 0 5px;
+      text-transform: uppercase;
+    }
+    #alphabet button {
+      padding: 10px;
+      margin: 5px;
+      font-size: 16px;
+      background-color: blue;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    #message {
+      font-size: 24px;
+      color: red;
+      margin-top: 20px;
+    }
+    #lives {
+      font-size: 20px;
+      margin-top: 10px;
+    }
+    #resultBox {
+      margin-top: 30px;
+    }
+    #resultBox img {
+      width: 150px;
+      margin-top: 15px;
+    }
+    .firework {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: red;
+      animation: explode 0.7s ease-out forwards;
+    }
+    @keyframes explode {
+      0% { transform: scale(1) translate(0, 0); opacity: 1; }
+      100% { transform: scale(3) translate(100px, -100px); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Word Guessing Game</h1>
+  <button id="startBtn">Start Game</button>
+
+  <div id="phrase"></div>
+  <div id="alphabet"></div>
+  <div id="lives"></div>
+  <div id="message"></div>
+  <div id="resultBox"></div>
+
+  <script>
+    const phraseToGuess = "Family City USA".toUpperCase();
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    let guessedLetters = [];
+    let wrongGuesses = 0;
+    const maxWrong = 7;
+
+    const phraseDiv = document.getElementById("phrase");
+    const alphabetDiv = document.getElementById("alphabet");
+    const livesDiv = document.getElementById("lives");
+    const messageDiv = document.getElementById("message");
+    const resultBox = document.getElementById("resultBox");
+    const startBtn = document.getElementById("startBtn");
+
+    function renderPhrase() {
+      phraseDiv.innerHTML = "";
+      for (let char of phraseToGuess) {
+        const span = document.createElement("span");
+        span.className = "letter";
+        if (char === " ") {
+          span.textContent = " ";
+          span.style.borderBottom = "none";
+        } else {
+          span.textContent = guessedLetters.includes(char) ? char : "";
+        }
+        phraseDiv.appendChild(span);
+      }
+    }
+
+    function renderAlphabet() {
+      alphabetDiv.innerHTML = "";
+      for (let letter of alphabet) {
+        const btn = document.createElement("button");
+        btn.textContent = letter;
+        btn.disabled = guessedLetters.includes(letter);
+        btn.addEventListener("click", () => handleGuess(letter));
+        alphabetDiv.appendChild(btn);
+      }
+    }
+
+    function handleGuess(letter) {
+      guessedLetters.push(letter);
+      if (!phraseToGuess.includes(letter)) {
+        wrongGuesses++;
+        livesDiv.textContent = `Lives left: ${maxWrong - wrongGuesses}`;
+        resultBox.innerHTML = `
+          <p>America is disappointed in you</p>
+          <img src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Bald_Eagle_Portrait.jpg" alt="Sad Bald Eagle">
+        `;
+      } else {
+        showFireworks();
+      }
+      renderPhrase();
+      renderAlphabet();
+      checkGameOver();
+    }
+
+    function showFireworks() {
+      for (let i = 0; i < 10; i++) {
+        const fw = document.createElement("div");
+        fw.className = "firework";
+        fw.style.left = Math.random() * window.innerWidth + 'px';
+        fw.style.top = Math.random() * window.innerHeight + 'px';
+        fw.style.backgroundColor = ["red", "white", "blue"][Math.floor(Math.random() * 3)];
+        document.body.appendChild(fw);
+        setTimeout(() => fw.remove(), 800);
+      }
+    }
+
+    function checkGameOver() {
+      const revealed = [...phraseToGuess].every(char => char === " " || guessedLetters.includes(char));
+      if (revealed) {
+        messageDiv.textContent = "You guessed it! \u{1F389}";
+        alphabetDiv.innerHTML = "";
+        resultBox.innerHTML = `
+          <p>You got it!! Good job America is proud of you!</p>
+          <img src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Bald_Eagle_Portrait.jpg" alt="Bald Eagle">
+        `;
+      } else if (wrongGuesses >= maxWrong) {
+        messageDiv.textContent = "You are out of lives :( Try again next time";
+        setTimeout(startGame, 2000);
+      }
+    }
+
+    function startGame() {
+      guessedLetters = [];
+      wrongGuesses = 0;
+      livesDiv.textContent = `Lives left: ${maxWrong}`;
+      messageDiv.textContent = "";
+      resultBox.innerHTML = "";
+      renderPhrase();
+      renderAlphabet();
+    }
+
+    startBtn.addEventListener("click", startGame);
+  </script>
+</body>
+</html>

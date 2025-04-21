@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sarah Millett Resume</title>
+</head>
+<body>
+
+  <h1>Sarah Millett</h1>
+  <p>(801) 368-7175 | sarahemillett@gmail.com | linkedin.com/in/SarahMillett</p>
+
+  <h2>EDUCATION</h2>
+  <p><strong>Brigham Young University</strong><br>
+  Bachelor of Science: Aspiring Strategic Management Major, Healthcare Leadership Minor<br>
+  GPA 3.77/4.00<br>
+  Apr 2027<br>
+  Provo, UT</p>
+  <ul>
+    <li>Extra-Curricular: Member of Corporate Strategy Association and Healthcare Leadership Association</li>
+    <li>Case Competition: 2<sup>nd</sup> Place Social Impact & Swig (2024), Participant in Bain & Co. +BYU (2023)</li>
+  </ul>
+
+  <h2>EXPERIENCE</h2>
+  <p><strong>BYU Ballard Center for Social Impact, Peery Business for Good Initiative</strong><br>
+  Faculty Relations Strategist<br>
+  Jan 2025-Present<br>
+  Provo, UT</p>
+  <ul>
+    <li>Created vision, mission, and values to align with company priorities, enhancing target market engagement</li>
+    <li>Led evaluation of funding proposals, strategically allocating $10,000 to optimize initiative impact</li>
+    <li>Designed data-driven surveys to track KPIs, analyze trends and inform strategic funding decisions</li>
+    <li>Structured funding agreements to align capital allocation with company goals, ensuring measurable results</li>
+  </ul>
+
+  <p><strong>Boys and Girls Club of the Peninsula San Francisco</strong><br>
+  Data Analyst<br>
+  Aug 2024-Dec 2025<br>
+  Provo, UT</p>
+  <ul>
+    <li>Identified data gaps, created and presented a 4-step strategic framework to attain critical data</li>
+    <li>Designed and implemented an interactive Tableau map, visualizing key variables to drive data insights</li>
+    <li>Presented insights to senior management, recommending expansion into new markets based on findings</li>
+    <li>Met weekly with project managers, presenting project deliverables and adapting to specific expectations</li>
+  </ul>
+
+  <p><strong>Missionary Training Center</strong><br>
+  Skill Development Mentor<br>
+  July 2024-Dec 2025<br>
+  Provo, UT</p>
+  <ul>
+    <li>Managed weekly sessions with 12 student partnerships in 3-5 time zones, ensuring seamless coordination</li>
+    <li>Customized instructional material weekly for 24 students, increasing concept retention by 25%</li>
+    <li>Created skill development assessments weekly, offered targeted guidance to improve performance by 15%</li>
+    <li>Collaborated with a team of 7-10 mentors, offered and received feedback and fostered an uplifting culture</li>
+  </ul>
+
+  <h2>VOLUNTEER EXPERIENCE</h2>
+  <p><strong>Church of Jesus Christ of Latter-Day Saints</strong><br>
+  Full Time Volunteer Representative<br>
+  Aug 2022-Jan 2023<br>
+  Cusco, Peru</p>
+  <ul>
+    <li>Dedicated 60+ hours per week to working with the community to find, serve and teach individuals in need</li>
+    <li>Communicated in Spanish for 8+ hours daily, focused on fostering connection and inspiring joy</li>
+    <li>Created 50+ grammar exercises to teach English to Peruvian volunteers, increased participation by 50%</li>
+    <li>Gained deep cultural empathy and understanding by directly engaging with Peruvians in their homes</li>
+  </ul>
+
+  <p><strong>Tabitha's Way Local Food Pantry</strong><br>
+  Pantry Attendant/Translator<br>
+  Oct 2023-Dec 2023<br>
+  Pleasant Grove, UT</p>
+  <ul>
+    <li>Served 3 hours a week, assisting 75+ Spanish speaking customers per day obtain the food needed to thrive</li>
+  </ul>
+
+  <p><strong>Red Cross</strong><br>
+  Blood Drive Marketing Lead<br>
+  March 2024<br>
+  Orem, UT</p>
+  <ul>
+    <li>Developed a targeted marketing strategy, leveraged incentives to increase attendance by 800%</li>
+  </ul>
+
+  <h2>LEADERSHIP & OTHER</h2>
+  <p><strong>Timpanogos High School - Student Body President, Students Against Trafficking Founder</strong> (2020-2021)</p>
+  <p><strong>BYU Healthcare Leadership Association - Lead Ambassador in charge of pitching</strong> (2025)</p>
+  <p><em>Skills: Microsoft Excel Associate, Basic proficiency: SQL, VBA, Tableau and working proficiency in Spanish</em></p>
+
+</body>
+</html>
